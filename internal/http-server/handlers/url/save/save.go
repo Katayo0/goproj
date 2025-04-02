@@ -38,7 +38,6 @@ type URLSaver interface{
 func New(log *slog.Logger, urlSaver URLSaver) gin.HandlerFunc {
 	return func(c *gin.Context){
 		const fnNm = "handlers.url.save.New"
-		requestid.RequestID(nil)
 		log = log.With(
 			slog.String("fnNm", fnNm),
 			slog.String("request_id", requestid.GetRequestIDFromContext(c)),
