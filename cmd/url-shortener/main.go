@@ -3,10 +3,12 @@ package main
 import (
 	"fmt"
 	"go_sql_test/internal/config"
+	"go_sql_test/internal/http-server/handlers/url/save"
 	"go_sql_test/internal/http-server/middleware/logger"
 	"go_sql_test/internal/lib/logger/sl"
 	"go_sql_test/internal/storage/psql"
 	"log/slog"
+
 	"net/http"
 	"os"
 
@@ -49,7 +51,22 @@ func main(){
 	engine.Use(logger.New(log))
 	engine.Use(gin.Recovery())
 
-	//TODO: run server
+	engine.POST("/url", save.New(log, storage))
+
+	log.Info("starting server", slog.String("address", cfg.Address))
+
+	srv := &http.Server{
+		Addr:         cfg.Address,
+		Handler:      engine,
+		ReadTimeout:  cfg.Timeout,
+		WriteTimeout: cfg.Timeout,
+		IdleTimeout:  cfg.IdleTimeout,
+	}
+	if err := srv.ListenAndServe(); err != nil {
+		log.Error("failed to start server")
+	}
+
+	log.Error("server stopped")
 }
 
 func setupLogger(env string) *slog.Logger{
