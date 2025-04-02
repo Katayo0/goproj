@@ -35,7 +35,7 @@ func New(log *slog.Logger) func(next http.Handler) http.Handler {
 			log.Debug("Method: %s, Path: %s, Status: %d, requestID: %d",
 					  c.Request.Method,
 					  c.Request.URL.Path,
-					  c.Writer.Status(),
+					  c.Request.Response.Status,
 					  requestid.GetRequestIDFromContext(c),
 					)
 		}
