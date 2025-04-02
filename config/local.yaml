@@ -1,0 +1,6 @@
+env: "local"
+storage_url: "postgresql://postgres:postgres@127.0.0.1:5430/db1?sslmode=disable"
+http_server:
+  address: "localhost:8080"
+  timeout: 4s
+  idle_timeout: 60s

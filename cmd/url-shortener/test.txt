@@ -1,0 +1,33 @@
+	/*
+	Code for  GetURL test
+	geturl, err := storage.GetURL("shikimori")
+	if err != nil {
+		log.Error("failed to find url", sl.Err(err))
+		os.Exit(1)
+	}
+	
+	log.Info("found url", slog.String("url:", geturl))
+
+	*/
+
+
+	/*
+	Code for SaveURL test
+
+
+	// specify why here used storage instead of psql
+	
+	id, err := storage.SaveURL("https://shikimori.one/", "shikimori")
+	if err != nil {
+		log.Error("failed to save url", sl.Err(err))
+		os.Exit(1)
+	}
+	
+	log.Info("saved url", slog.Int("id", id))
+
+	id, err = storage.SaveURL("https://shikimori.one/", "shikimori")
+	if err != nil {
+		log.Error("failed to save url", sl.Err(err))
+		os.Exit(1)
+	}
+	*/
