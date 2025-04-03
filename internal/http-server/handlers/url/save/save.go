@@ -1,7 +1,7 @@
 package save
 
 import (
-	"encoding/json"
+	//"encoding/json"
 	"errors"
 	resplib "go_sql_test/internal/lib/api/response"
 	"go_sql_test/internal/lib/logger/sl"
@@ -50,9 +50,9 @@ func New(log *slog.Logger, urlSaver URLSaver) gin.HandlerFunc {
 			log.Error("unable to bind body to struct")
 			errresp := resplib.Error("request body is empty")
 			c.JSON(200, gin.H{
-				"request": req,
+				"request":     req,
 				"error_code" : err,
-				"error": errresp,
+				"error":       errresp,
 			})
 			return
 		}
@@ -62,11 +62,11 @@ func New(log *slog.Logger, urlSaver URLSaver) gin.HandlerFunc {
 			validateErr := err.(validator.ValidationErrors)
 
 			log.Error("invalid request", sl.Err(err))
-			jsonresp, _:= json.Marshal(resplib.ValidationError(validateErr))
+			errresp:= resplib.ValidationError(validateErr)
 			c.JSON(200, gin.H{
-				"request":req,
-				"error_code":err,
-				"error":jsonresp,
+				"request":    req,
+				"error_code": err,
+				"error":      errresp,
 			})
 
 			return
@@ -82,21 +82,21 @@ func New(log *slog.Logger, urlSaver URLSaver) gin.HandlerFunc {
 		id, err := urlSaver.SaveURL(req.URL, alias)
 		if errors.Is(err, storage.ErrUrlExists){
 			log.Info("url already exists", slog.String("url", req.URL))
-			jsonresp, _ := json.Marshal(resplib.Error("url already exists"))
+			errresp := resplib.Error("url already exists")
 			c.JSON(200, gin.H{
-				"request":   req,
-				"error_code":err,
-				"error":     jsonresp,
+				"request":    req,
+				"error_code": err,
+				"error":      errresp,
 			})
 			return
 		}
 		if err != nil{
 			log.Info("failed to add url", sl.Err(err))
-			jsonresp, _ := json.Marshal(resplib.Error("failed to add url"))
+			errresp := resplib.Error("failed to add url")
 			c.JSON(200, gin.H{
-				"request":   req,
-				"error_code":err,
-				"error":     jsonresp,
+				"request":    req,
+				"error_code": err,
+				"error":      errresp,
 			})
 		}
 
