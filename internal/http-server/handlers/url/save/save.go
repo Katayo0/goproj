@@ -45,60 +45,18 @@ func New(log *slog.Logger, urlSaver URLSaver) gin.HandlerFunc {
 
 		var req Request
 	
-		dcded, derr := c.GetRawData()
-		if dcded == nil{
-			log.Error("request body is empty", sl.Err(derr))
-			jsonresp, _ := json.Marshal(resplib.Error("request body is empty"))
+		err := c.Bind(&req)
+		if err != nil{
+			log.Error("unable to bind body to struct")
+			errresp := resplib.Error("request body is empty")
 			c.JSON(200, gin.H{
-				"request":dcded,
-				"error_code":derr,
-				"error":jsonresp,
+				"request": req,
+				"error_code" : err,
+				"error": errresp,
 			})
 			return
 		}
-
-		//is it needed?
-		if derr != nil{
-			log.Error("failed to get data from context", sl.Err(derr))
-			jsonresp, _ := json.Marshal(resplib.Error("failed to get raw data"))
-			c.JSON(200, gin.H{
-				"request":dcded,
-				"error_code":derr,
-				"error":jsonresp,
-			})
-			return
-		}
-		//end of controversial code
-
-		log.Info("Got raw data from context", slog.Any("RawData", dcded))
-
 		
-		err := json.Unmarshal(dcded, &req)
-		if errors.Is(err, &json.InvalidUnmarshalError{}){
-			log.Error("request body is empty", sl.Err(err))
-			jsonresp, _ := json.Marshal(resplib.Error("failed to decode request"))
-			c.JSON(200, gin.H{
-				"request":dcded,
-				"error_code":err,
-				"error":jsonresp,
-			})
-
-			return
-		}
-		if err != nil {
-			log.Error("failed to decode request body", sl.Err(err))
-			jsonresp, _ := json.Marshal(resplib.Error("failed to decode request"))
-			c.JSON(200, gin.H{
-				"request":dcded,
-				"error_code":err,
-				"error":jsonresp,
-			})
-
-			return
-		}
-
-		log.Info("request body decoded", slog.Any("request", req))
-
 
 		if err := validator.New().Struct(req); err != nil {
 			validateErr := err.(validator.ValidationErrors)
@@ -106,7 +64,7 @@ func New(log *slog.Logger, urlSaver URLSaver) gin.HandlerFunc {
 			log.Error("invalid request", sl.Err(err))
 			jsonresp, _:= json.Marshal(resplib.ValidationError(validateErr))
 			c.JSON(200, gin.H{
-				"request":dcded,
+				"request":req,
 				"error_code":err,
 				"error":jsonresp,
 			})
@@ -126,7 +84,7 @@ func New(log *slog.Logger, urlSaver URLSaver) gin.HandlerFunc {
 			log.Info("url already exists", slog.String("url", req.URL))
 			jsonresp, _ := json.Marshal(resplib.Error("url already exists"))
 			c.JSON(200, gin.H{
-				"request":   dcded,
+				"request":   req,
 				"error_code":err,
 				"error":     jsonresp,
 			})
@@ -136,7 +94,7 @@ func New(log *slog.Logger, urlSaver URLSaver) gin.HandlerFunc {
 			log.Info("failed to add url", sl.Err(err))
 			jsonresp, _ := json.Marshal(resplib.Error("failed to add url"))
 			c.JSON(200, gin.H{
-				"request":   dcded,
+				"request":   req,
 				"error_code":err,
 				"error":     jsonresp,
 			})
